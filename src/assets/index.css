@@ -31,27 +31,6 @@
     --PhoneInput-color--focus: transparent;
   }
 
-  a {
-    color: #16bed7;
-    font-weight: 500;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-
-  pre {
-    padding: 5px;
-    font-size: 13px;
-    margin: 5px;
-    width: auto;
-    overflow: auto;
-    white-space: pre-wrap;       /* css-3 */
-    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
-  }
   .string { color: green; }
   .number { color: darkorange; }
   .boolean { color: blue; }
@@ -109,13 +88,7 @@
       transform: translateY(0);
     }
   }
-  
-  button,
-  input,
-  textarea {
-    font-weight: 300;
-  }
-  
+
   .slate-a {
     text-decoration: underline;
   }

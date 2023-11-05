@@ -69,6 +69,8 @@ Ordered list:
 
 [Test Link](http://example.com)
 [Test Anchor](#target)
+
+![](https://picsum.photos/300/200)
 `;
 
 /*const sourceDocuments = [

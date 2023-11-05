@@ -26,7 +26,7 @@ export const BotBubble = (props: Props) => {
 
   return (
     <div
-      class="flex justify-start mb-2 items-start host-container"
+      class="flex justify-start mb-4 items-start host-container"
       style={{ 'margin-right': '50px' }}
     >
       <Show when={props.showAvatar}>
@@ -34,7 +34,7 @@ export const BotBubble = (props: Props) => {
       </Show>
       <span
         ref={botMessageEl}
-        class="px-4 py-2 ml-2 whitespace-pre-wrap max-w-full chatbot-host-bubble"
+        class="px-4 py-2 ml-2 max-w-full chatbot-host-bubble prose"
         data-testid="host-bubble"
         style={{ "background-color": props.backgroundColor ?? defaultBackgroundColor, color: props.textColor ?? defaultTextColor, 'border-radius': '6px' }}
       />
