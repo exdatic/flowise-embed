@@ -70,7 +70,8 @@ Ordered list:
 [Test Link](http://example.com)
 [Test Anchor](#target)
 
-![](https://picsum.photos/300/200)
+![](https://picsum.photos/id/237/300/200)
+[![](https://picsum.photos/id/1084/300/200)](http://example.com)
 `;
 
 /*const sourceDocuments = [
