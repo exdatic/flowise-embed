@@ -41,6 +41,36 @@ export type BotProps = {
 
 const defaultWelcomeMessage = 'Hi there! How can I help?'
 
+const developmentWelcomeMessage = `
+# Heading level 1
+
+## Heading level 2
+
+### Heading level 3
+
+#### Heading level 4
+
+\`\`\`python
+def foo:
+    return "bar"
+\`\`\`
+
+Unordered list:
+
+- dog
+- cat
+- bird
+
+Ordered list:
+
+1. dog
+2. cat
+3. bird
+
+[Test Link](http://example.com)
+[Test Anchor](#target)
+`;
+
 /*const sourceDocuments = [
     {
         "pageContent": "I know some are talking about “living with COVID-19”. Tonight – I say that we will never just accept living with COVID-19. \r\n\r\nWe will continue to combat the virus as we do other diseases. And because this is a virus that mutates and spreads, we will stay on guard. \r\n\r\nHere are four common sense steps as we move forward safely.  \r\n\r\nFirst, stay protected with vaccines and treatments. We know how incredibly effective vaccines are. If you’re vaccinated and boosted you have the highest degree of protection. \r\n\r\nWe will never give up on vaccinating more Americans. Now, I know parents with kids under 5 are eager to see a vaccine authorized for their children. \r\n\r\nThe scientists are working hard to get that done and we’ll be ready with plenty of vaccines when they do. \r\n\r\nWe’re also ready with anti-viral treatments. If you get COVID-19, the Pfizer pill reduces your chances of ending up in the hospital by 90%.",
@@ -127,12 +157,21 @@ export const Bot = (props: BotProps & { class?: string }) => {
     const [loading, setLoading] = createSignal(false)
     const [sourcePopupOpen, setSourcePopupOpen] = createSignal(false)
     const [sourcePopupSrc, setSourcePopupSrc] = createSignal({})
-    const [messages, setMessages] = createSignal<MessageType[]>([
-        {
-            message: props.welcomeMessage ?? defaultWelcomeMessage,
-            type: 'apiMessage'
-        },
-    ], { equals: false })
+    const [messages, setMessages] = createSignal<MessageType[]>(
+        props.chatflowid === '' ?
+        [
+            {
+                message: developmentWelcomeMessage,
+                type: 'apiMessage'
+            },
+        ]:
+        [
+            {
+                message: props.welcomeMessage ?? defaultWelcomeMessage,
+                type: 'apiMessage'
+            },
+        ],
+        { equals: false })
     const [socketIOClientId, setSocketIOClientId] = createSignal('')
     const [isChatFlowAvailableToStream, setIsChatFlowAvailableToStream] = createSignal(false)
     const [chatId, setChatId] = createSignal(uuidv4())
