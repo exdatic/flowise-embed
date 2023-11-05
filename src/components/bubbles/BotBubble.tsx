@@ -1,6 +1,6 @@
 import { Show, onMount } from 'solid-js'
 import { Avatar } from '../avatars/Avatar'
-import { Marked } from '@ts-stack/markdown'
+import { Marked, Renderer } from '@ts-stack/markdown'
 
 type Props = {
   message: string
@@ -13,7 +13,33 @@ type Props = {
 const defaultBackgroundColor = '#f7f8ff'
 const defaultTextColor = '#303235'
 
-Marked.setOptions({ isNoP: true })
+class CustomRenderer extends Renderer {
+  link(href: string, title: string, text: string): string {
+    if (this.options.sanitize) {
+      let prot: string;
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        prot = decodeURIComponent(this.options.unescape!(href))
+          .replace(/[^\w:]/g, '')
+          .toLowerCase();
+      } catch (e) {
+        return text;
+      }
+      if (prot.indexOf('data:') === 0) {
+        return text;
+      }
+    }
+    let out = '<a href="' + href + '"';
+    if (title) {
+      out += ' title="' + title + '"';
+    }
+    // open link in new tab
+    out += ' target="_blank">' + text + '</a>';
+    return out;
+  }
+}
+
+Marked.setOptions({ isNoP: true, renderer: new CustomRenderer() })
 
 export const BotBubble = (props: Props) => {
   let botMessageEl: HTMLDivElement | undefined
