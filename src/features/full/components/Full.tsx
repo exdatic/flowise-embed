@@ -60,7 +60,7 @@ export const Full = (
             chatflowid={props.chatflowid}
             chatflowConfig={props.chatflowConfig}
             apiHost={props.apiHost}
-            isFullPage={true} />
+            isFullPage={props.theme?.chatWindow?.isFullPage} />
         </div>
       </Show>
     </>

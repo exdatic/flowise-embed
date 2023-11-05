@@ -40,6 +40,7 @@ export type ChatWindowTheme = {
     botMessage?: BotMessageTheme
     textInput?: TextInputTheme
     poweredByTextColor?: string
+    isFullPage?: boolean
 }
 
 export type ButtonTheme = {
