@@ -42,7 +42,7 @@ const indexConfig = {
       ]
     }),
     /* If you want to see the live app */
-    serve({
+    process.env.ROLLUP_WATCH && serve({
       open: false,
       verbose: true,
       contentBase: ["dist"],
@@ -53,7 +53,7 @@ const indexConfig = {
         'Access-Control-Allow-Origin': '*',
       }
     }),
-    livereload({ watch: "dist" }),
+    process.env.ROLLUP_WATCH && livereload({ watch: "dist" }),
   ],
 };
 
