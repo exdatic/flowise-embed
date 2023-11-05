@@ -72,6 +72,8 @@ Ordered list:
 
 ![](https://picsum.photos/id/237/300/200)
 [![](https://picsum.photos/id/1084/300/200)](http://example.com)
+
+[Action Link](#action?foo=1&bar=2)
 `;
 
 /*const sourceDocuments = [

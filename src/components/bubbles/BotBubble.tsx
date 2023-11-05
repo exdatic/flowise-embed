@@ -1,6 +1,6 @@
+import { Marked, Renderer } from '@ts-stack/markdown'
 import { Show, onMount } from 'solid-js'
 import { Avatar } from '../avatars/Avatar'
-import { Marked, Renderer } from '@ts-stack/markdown'
 
 type Props = {
   message: string
@@ -29,12 +29,16 @@ class CustomRenderer extends Renderer {
         return text;
       }
     }
+
     let out = '<a href="' + href + '"';
     if (title) {
       out += ' title="' + title + '"';
     }
     // open link in new tab
-    out += ' target="_blank">' + text + '</a>';
+    if (!href.startsWith('#')) {
+      out += ' target="_blank"';
+    }
+    out += ' >' + text + '</a>';
     return out;
   }
 }
@@ -47,6 +51,20 @@ export const BotBubble = (props: Props) => {
   onMount(() => {
     if (botMessageEl) {
       botMessageEl.innerHTML = Marked.parse(props.message)
+      const actionLinks = botMessageEl.querySelectorAll('a[href^="#action"]');
+      actionLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          const href = link.getAttribute('href');
+          if (href) {
+            const params = {};
+            const i = href.indexOf('?');
+            if (i >= 0) {
+              Object.assign(params, Object.fromEntries(new URLSearchParams(href.substring(i + 1))));
+            }
+            console.log('action link clicked', params);
+          }
+        });
+      });
     }
   })
 
