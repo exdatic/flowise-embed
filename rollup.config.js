@@ -10,12 +10,16 @@ import commonjs from "@rollup/plugin-commonjs";
 import { uglify } from "rollup-plugin-uglify";
 import serve from "rollup-plugin-serve";
 import livereload from "rollup-plugin-livereload";
-import copy from "rollup-plugin-copy"
+import copy from "rollup-plugin-copy";
+import replace from "@rollup/plugin-replace";
 
 const extensions = [".ts", ".tsx"];
 
 const indexConfig = {
   plugins: [
+    replace({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+    }),
     resolve({ extensions, browser: true }),
     commonjs(),
     uglify(),
@@ -42,7 +46,7 @@ const indexConfig = {
       ]
     }),
     /* If you want to see the live app */
-    process.env.ROLLUP_WATCH && serve({
+    process.env.NODE_ENV === 'development' && serve({
       open: false,
       verbose: true,
       contentBase: ["dist"],
@@ -53,7 +57,7 @@ const indexConfig = {
         'Access-Control-Allow-Origin': '*',
       }
     }),
-    process.env.ROLLUP_WATCH && livereload({ watch: "dist" }),
+    process.env.NODE_ENV === 'development' && livereload({ watch: "dist" }),
   ],
 };
 
