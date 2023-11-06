@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import resolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import { babel } from "@rollup/plugin-babel";
