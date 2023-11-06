@@ -14,6 +14,34 @@ const defaultBackgroundColor = '#f7f8ff'
 const defaultTextColor = '#303235'
 
 class CustomRenderer extends Renderer {
+  image(href: string, title: string, text: string): string {
+    let out = '<img src="' + href + '" alt="' + text + '"';
+
+    if (title) {
+      out += ' title="' + title + '"';
+    }
+
+    const css: {[key:string]: any} = {};
+    const url = new URL(href, window.location.href);
+    if (url.searchParams.has('width')) {
+      css['max-width'] = url.searchParams.get('width') + 'px';
+    }
+    if (url.searchParams.has('height')) {
+      css['max-height'] = url.searchParams.get('height') + 'px';
+    }
+    if (Object.keys(css).length > 0) {
+      out += ' style="';
+      for (const key in css) {
+        out += key + ':' + css[key] + ';';
+      }
+      out += '"';
+    }
+
+    out += this.options.xhtml ? '/>' : '>';
+
+    return out;
+  }
+
   link(href: string, title: string, text: string): string {
     if (this.options.sanitize) {
       let prot: string;
