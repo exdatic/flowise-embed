@@ -1,6 +1,9 @@
-import { Marked, Renderer } from '@ts-stack/markdown'
-import { Show, onMount } from 'solid-js'
-import { Avatar } from '../avatars/Avatar'
+import { Marked } from '@ts-stack/markdown';
+import { Show, onMount } from 'solid-js';
+
+import { Avatar } from '../avatars/Avatar';
+import { BotBubbleRenderer } from './BotBubbleRenderer';
+import { useMail } from '../useMail';
 
 type Props = {
   message: string
@@ -13,84 +16,23 @@ type Props = {
 const defaultBackgroundColor = '#f7f8ff'
 const defaultTextColor = '#303235'
 
-class CustomRenderer extends Renderer {
-  image(href: string, title: string, text: string): string {
-    let out = '<img src="' + href + '" alt="' + text + '"';
-
-    if (title) {
-      out += ' title="' + title + '"';
-    }
-
-    const css: {[key:string]: any} = {};
-    const url = new URL(href, window.location.href);
-    if (url.searchParams.has('width')) {
-      css['max-width'] = url.searchParams.get('width') + 'px';
-    }
-    if (url.searchParams.has('height')) {
-      css['max-height'] = url.searchParams.get('height') + 'px';
-    }
-    if (Object.keys(css).length > 0) {
-      out += ' style="';
-      for (const key in css) {
-        out += key + ':' + css[key] + ';';
-      }
-      out += '"';
-    }
-
-    out += this.options.xhtml ? '/>' : '>';
-
-    return out;
-  }
-
-  link(href: string, title: string, text: string): string {
-    if (this.options.sanitize) {
-      let prot: string;
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        prot = decodeURIComponent(this.options.unescape!(href))
-          .replace(/[^\w:]/g, '')
-          .toLowerCase();
-      } catch (e) {
-        return text;
-      }
-      if (prot.indexOf('data:') === 0) {
-        return text;
-      }
-    }
-
-    let out = '<a href="' + href + '"';
-    if (title) {
-      out += ' title="' + title + '"';
-    }
-    // open link in new tab
-    if (!href.startsWith('#')) {
-      out += ' target="_blank"';
-    }
-    out += ' >' + text + '</a>';
-    return out;
-  }
-}
-
-Marked.setOptions({ isNoP: true, renderer: new CustomRenderer() })
+Marked.setOptions({ isNoP: true, renderer: new BotBubbleRenderer() })
 
 export const BotBubble = (props: Props) => {
-  let botMessageEl: HTMLDivElement | undefined
+  let botMessageEl: HTMLDivElement | undefined;
+  const [mailOpen, setMailOpen] = useMail();
 
   onMount(() => {
     if (botMessageEl) {
       botMessageEl.innerHTML = Marked.parse(props.message)
-      const actionLinks = botMessageEl.querySelectorAll('a[href^="#action"]');
+      const actionLinks = botMessageEl.querySelectorAll('a[href^="picksto:"]');
       actionLinks.forEach(link => {
-        link.addEventListener('click', () => {
-          const href = link.getAttribute('href');
-          if (href) {
-            const params = {};
-            const i = href.indexOf('?');
-            if (i >= 0) {
-              Object.assign(params, Object.fromEntries(new URLSearchParams(href.substring(i + 1))));
-            }
-            console.log('action link clicked', params);
-          }
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          setMailOpen(true, link.getAttribute('href'));
         });
       });
     }

@@ -13,6 +13,8 @@ import { Popup } from '@/features/popup'
 import { Avatar } from '@/components/avatars/Avatar'
 import { DeleteButton } from '@/components/SendButton'
 
+import { MailProvider } from './MailProvider'
+
 type messageType = 'apiMessage' | 'userMessage' | 'usermessagewaiting'
 
 export type MessageType = {
@@ -68,13 +70,14 @@ Ordered list:
 3. bird
 
 [Test Link](http://example.com)
+[Test Local Link](./foo)
 [Test Anchor](#target)
 
 ![](https://picsum.photos/id/237/300/200)
 ![](https://picsum.photos/id/237/300/200?width=48&height=48)
 [![](https://picsum.photos/id/1084/300/200)](http://example.com)
 
-[Action Link](#action?foo=1&bar=2)
+[Get Recommendations by Email](picksto://example.com/send-picks?ids=1,2,3)
 `;
 
 /*const sourceDocuments = [
@@ -412,103 +415,105 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
     return (
         <>
-            <div ref={botContainer} class={'relative flex w-full h-full text-base overflow-hidden bg-cover bg-center flex-col items-center chatbot-container ' + props.class}>
-                <div class="flex w-full h-full justify-center">
-                    <div style={{ "padding-bottom": '100px', "padding-top": '70px' }} ref={chatContainer} class="overflow-y-scroll min-w-full w-full min-h-full px-3 pt-10 relative scrollable-container chatbot-chat-view scroll-smooth">
-                        <For each={[...messages()]}>
-                            {(message, index) => (
+            <MailProvider>
+                <div ref={botContainer} class={'relative flex w-full h-full text-base overflow-hidden bg-cover bg-center flex-col items-center chatbot-container ' + props.class}>
+                    <div class="flex w-full h-full justify-center">
+                        <div style={{ "padding-bottom": '100px', "padding-top": '70px' }} ref={chatContainer} class="overflow-y-scroll min-w-full w-full min-h-full px-3 pt-10 relative scrollable-container chatbot-chat-view scroll-smooth">
+                            <For each={[...messages()]}>
+                                {(message, index) => (
+                                    <>
+                                        {message.type === 'userMessage' && (
+                                            <GuestBubble
+                                                message={message.message}
+                                                backgroundColor={props.userMessage?.backgroundColor}
+                                                textColor={props.userMessage?.textColor}
+                                                showAvatar={props.userMessage?.showAvatar}
+                                                avatarSrc={props.userMessage?.avatarSrc}
+                                            />
+                                        )}
+                                        {message.type === 'apiMessage' && (
+                                            <BotBubble
+                                                message={message.message}
+                                                backgroundColor={props.botMessage?.backgroundColor}
+                                                textColor={props.botMessage?.textColor}
+                                                showAvatar={props.botMessage?.showAvatar}
+                                                avatarSrc={props.botMessage?.avatarSrc}
+                                            />
+                                        )}
+                                        {message.type === 'userMessage' && loading() && index() === messages().length - 1 && (
+                                            <LoadingBubble />
+                                        )}
+                                        {message.sourceDocuments && message.sourceDocuments.length &&
+                                            <div style={{ display: 'flex', "flex-direction": 'row', width: '100%' }}>
+                                                <For each={[...removeDuplicateURL(message)]}>
+                                                    {(src) => {
+                                                        const URL = isValidURL(src.metadata.source)
+                                                        return (
+                                                            <SourceBubble
+                                                                pageContent={URL ? URL.pathname : src.pageContent}
+                                                                metadata={src.metadata}
+                                                                onSourceClick={() => {
+                                                                    if (URL) {
+                                                                        window.open(src.metadata.source, '_blank')
+                                                                    }
+                                                                    else {
+                                                                        setSourcePopupSrc(src);
+                                                                        setSourcePopupOpen(true);
+                                                                    }
+                                                                }}
+                                                            />
+                                                        )
+                                                    }}
+                                                </For>
+                                            </div>}
+                                    </>
+                                )}
+                            </For>
+                        </div>
+                        <div style={{
+                            display: 'flex',
+                            "flex-direction": 'row',
+                            "align-items": 'center',
+                            height: '50px',
+                            position: props.isFullPage ? 'fixed' : 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            background: props.bubbleBackgroundColor,
+                            color: props.bubbleTextColor,
+                            "border-top-left-radius": props.isFullPage ? '0px' : '6px',
+                            "border-top-right-radius": props.isFullPage ? '0px' : '6px'
+                        }}>
+                            <Show when={props.titleAvatarSrc}>
                                 <>
-                                    {message.type === 'userMessage' && (
-                                        <GuestBubble
-                                            message={message.message}
-                                            backgroundColor={props.userMessage?.backgroundColor}
-                                            textColor={props.userMessage?.textColor}
-                                            showAvatar={props.userMessage?.showAvatar}
-                                            avatarSrc={props.userMessage?.avatarSrc}
-                                        />
-                                    )}
-                                    {message.type === 'apiMessage' && (
-                                        <BotBubble
-                                            message={message.message}
-                                            backgroundColor={props.botMessage?.backgroundColor}
-                                            textColor={props.botMessage?.textColor}
-                                            showAvatar={props.botMessage?.showAvatar}
-                                            avatarSrc={props.botMessage?.avatarSrc}
-                                        />
-                                    )}
-                                    {message.type === 'userMessage' && loading() && index() === messages().length - 1 && (
-                                        <LoadingBubble />
-                                    )}
-                                    {message.sourceDocuments && message.sourceDocuments.length &&
-                                        <div style={{ display: 'flex', "flex-direction": 'row', width: '100%' }}>
-                                            <For each={[...removeDuplicateURL(message)]}>
-                                                {(src) => {
-                                                    const URL = isValidURL(src.metadata.source)
-                                                    return (
-                                                        <SourceBubble
-                                                            pageContent={URL ? URL.pathname : src.pageContent}
-                                                            metadata={src.metadata}
-                                                            onSourceClick={() => {
-                                                                if (URL) {
-                                                                    window.open(src.metadata.source, '_blank')
-                                                                }
-                                                                else {
-                                                                    setSourcePopupSrc(src);
-                                                                    setSourcePopupOpen(true);
-                                                                }
-                                                            }}
-                                                        />
-                                                    )
-                                                }}
-                                            </For>
-                                        </div>}
+                                    <div style={{ width: '15px' }}/>
+                                    <Avatar initialAvatarSrc={props.titleAvatarSrc} />
                                 </>
-                            )}
-                        </For>
+                            </Show>
+                            <Show when={props.title}>
+                                <span class="px-3 whitespace-pre-wrap font-semibold max-w-full">{props.title}</span>
+                            </Show>
+                            <div style={{ flex: 1 }}></div>
+                            <DeleteButton sendButtonColor={props.bubbleTextColor} type='button' isDisabled={messages().length === 1} class='my-2 ml-2' on:click={clearChat}>
+                                <span style={{ 'font-family': 'Poppins, sans-serif' }}>Clear</span>
+                            </DeleteButton>
+                        </div>
+                        <TextInput
+                            backgroundColor={props.textInput?.backgroundColor}
+                            textColor={props.textInput?.textColor}
+                            placeholder={props.textInput?.placeholder}
+                            sendButtonColor={props.textInput?.sendButtonColor}
+                            fontSize={props.fontSize}
+                            disabled={loading()}
+                            defaultValue={userInput()}
+                            onSubmit={handleSubmit}
+                        />
                     </div>
-                    <div style={{
-                        display: 'flex',
-                        "flex-direction": 'row',
-                        "align-items": 'center',
-                        height: '50px',
-                        position: props.isFullPage ? 'fixed' : 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        background: props.bubbleBackgroundColor,
-                        color: props.bubbleTextColor,
-                        "border-top-left-radius": props.isFullPage ? '0px' : '6px',
-                        "border-top-right-radius": props.isFullPage ? '0px' : '6px'
-                    }}>
-                        <Show when={props.titleAvatarSrc}>
-                            <>
-                                <div style={{ width: '15px' }}/>
-                                <Avatar initialAvatarSrc={props.titleAvatarSrc} />
-                            </>
-                        </Show>
-                        <Show when={props.title}>
-                            <span class="px-3 whitespace-pre-wrap font-semibold max-w-full">{props.title}</span>
-                        </Show>
-                        <div style={{ flex: 1 }}></div>
-                        <DeleteButton sendButtonColor={props.bubbleTextColor} type='button' isDisabled={messages().length === 1} class='my-2 ml-2' on:click={clearChat}>
-                            <span style={{ 'font-family': 'Poppins, sans-serif' }}>Clear</span>
-                        </DeleteButton>
-                    </div>
-                    <TextInput
-                        backgroundColor={props.textInput?.backgroundColor}
-                        textColor={props.textInput?.textColor}
-                        placeholder={props.textInput?.placeholder}
-                        sendButtonColor={props.textInput?.sendButtonColor}
-                        fontSize={props.fontSize}
-                        disabled={loading()}
-                        defaultValue={userInput()}
-                        onSubmit={handleSubmit}
-                    />
+                    {/* <Badge badgeBackgroundColor={props.badgeBackgroundColor} poweredByTextColor={props.poweredByTextColor} botContainer={botContainer} /> */}
+                    <BottomSpacer ref={bottomSpacer} />
                 </div>
-                {/* <Badge badgeBackgroundColor={props.badgeBackgroundColor} poweredByTextColor={props.poweredByTextColor} botContainer={botContainer} /> */}
-                <BottomSpacer ref={bottomSpacer} />
-            </div>
-            {sourcePopupOpen() && <Popup isOpen={sourcePopupOpen()} value={sourcePopupSrc()} onClose={() => setSourcePopupOpen(false)} />}
+                {sourcePopupOpen() && <Popup isOpen={sourcePopupOpen()} value={sourcePopupSrc()} onClose={() => setSourcePopupOpen(false)} />}
+            </MailProvider>
         </>
     )
 }

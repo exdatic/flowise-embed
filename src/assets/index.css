@@ -380,3 +380,13 @@ input {
     padding: 10px 10px;
     font-family: 'Poppins', sans-serif;
 }
+
+.dialog {
+  font-family: 'Open Sans', -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+.dialog::backdrop {
+  background-color: hsla(0, 0%, 0%, 0.5);
+}
