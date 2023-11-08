@@ -11,6 +11,7 @@ type Props = {
   avatarSrc?: string
   backgroundColor?: string
   textColor?: string
+  submit: (value: string) => void
 }
 
 const defaultBackgroundColor = '#f7f8ff'
@@ -25,14 +26,25 @@ export const BotBubble = (props: Props) => {
   onMount(() => {
     if (botMessageEl) {
       botMessageEl.innerHTML = Marked.parse(props.message)
-      const actionLinks = botMessageEl.querySelectorAll('a[href^="picksto:"]');
-      actionLinks.forEach(link => {
+      const pickstoLinks = botMessageEl.querySelectorAll('a[href^="picksto:"]');
+      pickstoLinks.forEach(link => {
         link.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
 
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           setMailOpen(true, link.getAttribute('href'));
+        });
+      });
+
+      const buttons = botMessageEl.querySelectorAll('button');
+      buttons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          props.submit(button.innerText);
         });
       });
     }
