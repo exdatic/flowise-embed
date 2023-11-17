@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      main {
+        margin: auto; max-width: 992px;
+      }
+      #chatbot {
+        outline: 1px solid hsl(210, 6%, 93%);
+        border-radius: 6px;
+      }
+      #warning {
+        color: red;
+        padding: 1rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Chatbot Test</h1>
+      <div id="warning"></div>
+      <div id="chatbot">
+        <flowise-fullchatbot></flowise-fullchatbot>
+      </div>
+      <script type="module">
+        import Chatbot from "./web.js"
+        const chatflowid = new URLSearchParams(location.search).get("chatflowid");
+        if (!chatflowid) {
+          document.getElementById("warning").innerHTML =
+            "Please provide a <code>chatflowid</code> in the URL query string.";
+            Chatbot.initFull({
+              chatflowid: "",
+              apiHost: "https://chat.exdatis.com",
+            })
+          } else {
+          Chatbot.initFull({
+            chatflowid: chatflowid,
+            apiHost: "https://chat.exdatis.com",
+          })
+        }
+      </script>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,1 @@
+{"version":3,"file":"MailProvider.d.ts","sourceRoot":"","sources":["../../src/components/MailProvider.tsx"],"names":[],"mappings":"AAGA,OAAO,EAAE,QAAQ,EAAE,SAAS,EAAsD,MAAM,UAAU,CAAC;AAEnG,eAAO,MAAM,WAAW,wDAA4C,OAAO,QAAQ,MAAM,GAAG,IAAI,KAAK,IAAI,cAAI,CAAC;AAE9G,eAAO,MAAM,YAAY,EAAE,SAAS,CAAC;IAAE,QAAQ,EAAE,GAAG,CAAA;CAAE,CA2IrD,CAAA"}
