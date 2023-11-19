@@ -37,8 +37,8 @@ export const MailProvider: Component<{ children: any }> = (props) => {
     const endpoint = href();
     if (endpoint && recipient) {
       setLoading(true);
-      const url = new URL(endpoint);
-      fetch(`https://${url.pathname}`, {
+      const url = new URL(endpoint.replace("picksto:", "https:"));
+      fetch(`https://${url.host}${url.pathname}`, {
         method: 'POST',
         headers: {'Content-Type' : 'application/json'},
         body: JSON.stringify({
