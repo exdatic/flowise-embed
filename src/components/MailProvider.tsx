@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Modal } from 'flowbite';
-import { set } from 'lodash';
 import { Accessor, Component, createContext, createEffect, createSignal, onMount } from 'solid-js';
 
 export const MailContext = createContext<[Accessor<boolean>, (open: boolean, href: string | null) => void]>();

@@ -1,4 +1,4 @@
-import { createSignal, createEffect, For, onMount, Show, createMemo } from 'solid-js'
+import { createSignal, createEffect, createMemo, For, onMount, Show } from 'solid-js'
 import { v4 as uuidv4 } from 'uuid'
 import { sendMessageQuery, isStreamAvailableQuery, IncomingInput } from '@/queries/sendMessageQuery'
 import { TextInput } from './inputs/textInput'
@@ -12,7 +12,7 @@ import socketIOClient from 'socket.io-client'
 import { Popup } from '@/features/popup'
 import { Avatar } from '@/components/avatars/Avatar'
 import { DeleteButton } from '@/components/SendButton'
-
+import { exampleMarkdownMessage } from './examples'
 import { MailProvider } from './MailProvider'
 
 type messageType = 'apiMessage' | 'userMessage' | 'usermessagewaiting'
@@ -21,6 +21,7 @@ export type MessageType = {
     message: string
     type: messageType,
     sourceDocuments?: any
+    fileAnnotations?: any
 }
 
 export type BotProps = {
@@ -42,48 +43,6 @@ export type BotProps = {
 }
 
 const defaultWelcomeMessage = 'Hi there! How can I help?'
-
-const developmentWelcomeMessage = `
-# Heading level 1
-
-## Heading level 2
-
-### Heading level 3
-
-#### Heading level 4
-
-\`\`\`python
-def foo:
-    return "bar"
-\`\`\`
-
-Unordered list:
-
-- dog
-- cat
-- bird
-
-Ordered list:
-
-1. dog
-2. cat
-3. bird
-
-[Test Link](http://example.com)
-[Test Local Link](./foo)
-[Test Anchor](#target)
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam, quis nostrud [exercitation ullamco](#) laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-![](https://picsum.photos/id/237/300/200)
-![](https://picsum.photos/id/237/300/200?width=48&height=48)
-[![](https://picsum.photos/id/1084/300/200)](http://example.com)
-
-[Get Recommendations by Email](picksto://example.com/send-picks?ids=1,2,3)
-`;
 
 /*const sourceDocuments = [
     {
@@ -178,7 +137,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
         props.chatflowid === '' ?
         [
             {
-                message: developmentWelcomeMessage,
+                message: exampleMarkdownMessage,
                 type: 'apiMessage'
             },
         ]:
@@ -297,7 +256,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
                 else text = JSON.stringify(data, null, 2)
 
                 setMessages((prevMessages) => {
-                    const messages: MessageType[] = [...prevMessages, { message: text, sourceDocuments: data?.sourceDocuments, type: 'apiMessage' }]
+                    const messages: MessageType[] = [...prevMessages, { message: text, sourceDocuments: data?.sourceDocuments, fileAnnotations: data?.fileAnnotations, type: 'apiMessage' }]
                     addChatMessage(messages)
                     return messages
                 })
@@ -353,6 +312,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
                     type: message.type
                 }
                 if (message.sourceDocuments) chatHistory.sourceDocuments = message.sourceDocuments
+                if (message.fileAnnotations) chatHistory.fileAnnotations = message.fileAnnotations
                 return chatHistory
             })
             setMessages([...loadedMessages])
@@ -442,6 +402,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
                                         {message.type === 'apiMessage' && (
                                             <BotBubble
                                                 message={message.message}
+                                                fileAnnotations={message.fileAnnotations}
+                                                apiHost={props.apiHost}
                                                 backgroundColor={props.botMessage?.backgroundColor}
                                                 textColor={props.botMessage?.textColor}
                                                 showAvatar={props.botMessage?.showAvatar}
