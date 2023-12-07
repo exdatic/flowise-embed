@@ -1,5 +1,5 @@
 {
-    "name": "flowise-embed",
+    "name": "@exdatic/flowise-embed",
     "version": "1.0.16-2",
     "description": "Javascript library to display flowise chatbot on your website",
     "type": "module",
