@@ -1,11 +1,12 @@
 import { createSignal, createEffect, createMemo, For, onMount, Show } from 'solid-js';
 import { v4 as uuidv4 } from 'uuid';
-import { sendMessageQuery, isStreamAvailableQuery, IncomingInput } from '@/queries/sendMessageQuery';
+import {sendMessageQuery, isStreamAvailableQuery, IncomingInput, getChatbotConfig} from '@/queries/sendMessageQuery';
 import { TextInput } from './inputs/textInput';
 import { GuestBubble } from './bubbles/GuestBubble';
 import { BotBubble } from './bubbles/BotBubble';
 import { LoadingBubble } from './bubbles/LoadingBubble';
 import { SourceBubble } from './bubbles/SourceBubble';
+import { StarterPromptBubble } from './bubbles/StarterPromptBubble';
 import { BotMessageTheme, TextInputTheme, UserMessageTheme } from '@/features/bubble/types';
 import socketIOClient from 'socket.io-client';
 import { Popup } from '@/features/popup';
@@ -150,6 +151,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
   const [socketIOClientId, setSocketIOClientId] = createSignal('');
   const [isChatFlowAvailableToStream, setIsChatFlowAvailableToStream] = createSignal(false);
   const [chatId, setChatId] = createSignal(uuidv4());
+  const [starterPrompts, setStarterPrompts] = createSignal<string[]>([], {equals: false});
 
   onMount(() => {
     if (!bottomSpacer) return;
@@ -208,6 +210,10 @@ export const Bot = (props: BotProps & { class?: string }) => {
     setUserInput('');
     scrollToBottom();
   };
+
+  const promptClick = (prompt: string) => {
+    handleSubmit(prompt);
+  }
 
   // Handle form submission
   const handleSubmit = async (value: string) => {
@@ -320,6 +326,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
       setMessages([...loadedMessages]);
     }
 
+    // Determine if particular chatflow is available for streaming
     const { data } = await isStreamAvailableQuery({
       chatflowid: props.chatflowid,
       apiHost: props.apiHost,
@@ -327,6 +334,23 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
     if (data) {
       setIsChatFlowAvailableToStream(data?.isStreaming ?? false);
+    }
+
+    // Get the chatbotConfig
+    const result = await getChatbotConfig({
+      chatflowid: props.chatflowid,
+      apiHost: props.apiHost,
+    });
+
+    if (result.data) {
+      const chatbotConfig = result.data
+      if (chatbotConfig.starterPrompts) {
+        const prompts: string[] = []
+        Object.getOwnPropertyNames(chatbotConfig.starterPrompts).forEach((key) => {
+          prompts.push(chatbotConfig.starterPrompts[key].prompt)
+        });
+        setStarterPrompts(prompts);
+      }
     }
 
     const socket = socketIOClient(props.apiHost as string);
@@ -502,6 +526,20 @@ export const Bot = (props: BotProps & { class?: string }) => {
           </div>
           <BottomSpacer ref={bottomSpacer} />
         </div>
+        <Show when={messages().length === 1}>
+          <Show when={starterPrompts().length > 0}>
+            <div style={{ display: 'flex', 'flex-direction': 'row', padding: '10px', width: '100%', "flex-wrap": 'wrap'}}>
+              <For each={[...starterPrompts()]}>
+                {(key) => (
+                  <StarterPromptBubble
+                    prompt={key}
+                    onPromptClick={() => promptClick(key)}
+                  />
+                )}
+              </For>
+            </div>
+          </Show>
+        </Show>
         {sourcePopupOpen() && <Popup isOpen={sourcePopupOpen()} value={sourcePopupSrc()} onClose={() => setSourcePopupOpen(false)} />}
       </MailProvider>
     </>
