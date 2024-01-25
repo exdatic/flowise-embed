@@ -3,6 +3,7 @@ import styles from '../../../assets/index.css';
 import { BubbleButton } from './BubbleButton';
 import { BubbleParams } from '../types';
 import { Bot, BotProps } from '../../../components/Bot';
+import { MailProvider } from '@/components/MailProvider';
 
 const defaultButtonColor = '#3B81F6';
 const defaultIconColor = 'white';
@@ -49,24 +50,28 @@ export const Bubble = (props: BubbleProps) => {
           (props.theme?.button?.size === 'large' ? ' bottom-24' : ' bottom-20')
         }
       >
-        <Show when={isBotStarted()}>
-          <Bot
-            badgeBackgroundColor={bubbleProps.theme?.chatWindow?.backgroundColor}
-            bubbleBackgroundColor={bubbleProps.theme?.button?.backgroundColor ?? defaultButtonColor}
-            bubbleTextColor={bubbleProps.theme?.button?.iconColor ?? defaultIconColor}
-            title={bubbleProps.theme?.chatWindow?.title}
-            titleAvatarSrc={bubbleProps.theme?.chatWindow?.titleAvatarSrc}
-            welcomeMessage={bubbleProps.theme?.chatWindow?.welcomeMessage}
-            poweredByTextColor={bubbleProps.theme?.chatWindow?.poweredByTextColor}
-            textInput={bubbleProps.theme?.chatWindow?.textInput}
-            botMessage={bubbleProps.theme?.chatWindow?.botMessage}
-            userMessage={bubbleProps.theme?.chatWindow?.userMessage}
-            fontSize={bubbleProps.theme?.chatWindow?.fontSize}
-            chatflowid={props.chatflowid}
-            chatflowConfig={props.chatflowConfig}
-            apiHost={props.apiHost}
-          />
-        </Show>
+        <MailProvider>
+          <Show when={isBotStarted()}>
+            <Bot
+              badgeBackgroundColor={bubbleProps.theme?.chatWindow?.backgroundColor}
+              bubbleBackgroundColor={bubbleProps.theme?.button?.backgroundColor ?? defaultButtonColor}
+              bubbleTextColor={bubbleProps.theme?.button?.iconColor ?? defaultIconColor}
+              showTitle={bubbleProps.theme?.chatWindow?.showTitle}
+              title={bubbleProps.theme?.chatWindow?.title}
+              titleAvatarSrc={bubbleProps.theme?.chatWindow?.titleAvatarSrc}
+              welcomeMessage={bubbleProps.theme?.chatWindow?.welcomeMessage}
+              poweredByTextColor={bubbleProps.theme?.chatWindow?.poweredByTextColor}
+              textInput={bubbleProps.theme?.chatWindow?.textInput}
+              botMessage={bubbleProps.theme?.chatWindow?.botMessage}
+              userMessage={bubbleProps.theme?.chatWindow?.userMessage}
+              fontSize={bubbleProps.theme?.chatWindow?.fontSize}
+              chatflowid={props.chatflowid}
+              chatflowConfig={props.chatflowConfig}
+              apiHost={props.apiHost}
+              observersConfig={props.observersConfig}
+            />
+          </Show>
+        </MailProvider>
       </div>
     </>
   );

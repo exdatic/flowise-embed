@@ -1,6 +1,6 @@
-import { createSignal, createEffect, createMemo, For, onMount, Show } from 'solid-js';
+import { createSignal, createEffect, For, onMount, Show, mergeProps, createMemo, Accessor } from 'solid-js';
 import { v4 as uuidv4 } from 'uuid';
-import {sendMessageQuery, isStreamAvailableQuery, IncomingInput, getChatbotConfig} from '@/queries/sendMessageQuery';
+import { sendMessageQuery, isStreamAvailableQuery, IncomingInput, getChatbotConfig } from '@/queries/sendMessageQuery';
 import { TextInput } from './inputs/textInput';
 import { GuestBubble } from './bubbles/GuestBubble';
 import { BotBubble } from './bubbles/BotBubble';
@@ -13,9 +13,12 @@ import { Popup } from '@/features/popup';
 import { Avatar } from '@/components/avatars/Avatar';
 import { DeleteButton } from '@/components/SendButton';
 import { exampleMarkdownMessage } from './examples';
-import { MailProvider } from './MailProvider';
 
 type messageType = 'apiMessage' | 'userMessage' | 'usermessagewaiting';
+
+type observerConfigType = (accessor: string | boolean | object | MessageType[]) => void;
+
+export type observersConfigType = Record<'observeUserInput' | 'observeLoading' | 'observeMessages', observerConfigType>;
 
 export type MessageType = {
   message: string;
@@ -36,10 +39,12 @@ export type BotProps = {
   badgeBackgroundColor?: string;
   bubbleBackgroundColor?: string;
   bubbleTextColor?: string;
+  showTitle?: boolean;
   title?: string;
   titleAvatarSrc?: string;
   fontSize?: number;
   isFullPage?: boolean;
+  observersConfig?: observersConfigType;
 };
 
 const defaultWelcomeMessage = 'Hi there! How can I help?';
@@ -121,7 +126,9 @@ const defaultWelcomeMessage = 'Hi there! How can I help?';
     },
 ]*/
 
-export const Bot = (props: BotProps & { class?: string }) => {
+export const Bot = (botProps: BotProps & { class?: string }) => {
+  // set a default value for showTitle if not set and merge with other props
+  const props = mergeProps({ showTitle: true }, botProps);
   let chatContainer: HTMLDivElement | undefined;
   let bottomSpacer: HTMLDivElement | undefined;
   let botContainer: HTMLDivElement | undefined;
@@ -141,19 +148,38 @@ export const Bot = (props: BotProps & { class?: string }) => {
           },
         ]
       : [
-          {
-            message: props.welcomeMessage ?? defaultWelcomeMessage,
-            type: 'apiMessage',
-          },
-        ],
+      {
+        message: props.welcomeMessage ?? defaultWelcomeMessage,
+        type: 'apiMessage',
+      },
+    ],
     { equals: false },
   );
   const [socketIOClientId, setSocketIOClientId] = createSignal('');
   const [isChatFlowAvailableToStream, setIsChatFlowAvailableToStream] = createSignal(false);
   const [chatId, setChatId] = createSignal(uuidv4());
-  const [starterPrompts, setStarterPrompts] = createSignal<string[]>([], {equals: false});
+  const [starterPrompts, setStarterPrompts] = createSignal<string[]>([], { equals: false });
 
   onMount(() => {
+    if (botProps?.observersConfig) {
+      const { observeUserInput, observeLoading, observeMessages } = botProps.observersConfig;
+      typeof observeUserInput === 'function' &&
+        // eslint-disable-next-line solid/reactivity
+        createMemo(() => {
+          observeUserInput(userInput());
+        });
+      typeof observeLoading === 'function' &&
+        // eslint-disable-next-line solid/reactivity
+        createMemo(() => {
+          observeLoading(loading());
+        });
+      typeof observeMessages === 'function' &&
+        // eslint-disable-next-line solid/reactivity
+        createMemo(() => {
+          observeMessages(messages());
+        });
+    }
+
     if (!bottomSpacer) return;
     setTimeout(() => {
       chatContainer?.scrollTo(0, chatContainer.scrollHeight);
@@ -213,7 +239,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
   const promptClick = (prompt: string) => {
     handleSubmit(prompt);
-  }
+  };
 
   // Handle form submission
   const handleSubmit = async (value: string) => {
@@ -343,11 +369,11 @@ export const Bot = (props: BotProps & { class?: string }) => {
     });
 
     if (result.data) {
-      const chatbotConfig = result.data
+      const chatbotConfig = result.data;
       if (chatbotConfig.starterPrompts) {
-        const prompts: string[] = []
+        const prompts: string[] = [];
         Object.getOwnPropertyNames(chatbotConfig.starterPrompts).forEach((key) => {
-          prompts.push(chatbotConfig.starterPrompts[key].prompt)
+          prompts.push(chatbotConfig.starterPrompts[key].prompt);
         });
         setStarterPrompts(prompts);
       }
@@ -409,74 +435,74 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
   return (
     <>
-      <MailProvider>
-        <div
-          ref={botContainer}
-          class={
-            'relative flex w-full h-full text-base overflow-hidden bg-cover bg-center flex-col items-center chatbot-container ' + (props.class || '')
-          }
-        >
-          <div class="flex w-full h-full justify-center">
-            <div
-              style={{ 'padding-bottom': '100px', 'padding-top': '70px' }}
-              ref={chatContainer}
-              class={
-                'overflow-y-scroll min-w-full w-full min-h-full px-3 pt-10 relative scrollable-container chatbot-chat-view ' +
-                (isSafari() ? 'scroll-auto' : 'scroll-smooth')
-              }
-            >
-              <For each={[...messages()]}>
-                {(message, index) => (
-                  <>
-                    {message.type === 'userMessage' && (
-                      <GuestBubble
-                        message={message.message}
-                        backgroundColor={props.userMessage?.backgroundColor}
-                        textColor={props.userMessage?.textColor}
-                        showAvatar={props.userMessage?.showAvatar}
-                        avatarSrc={props.userMessage?.avatarSrc}
-                      />
-                    )}
-                    {message.type === 'apiMessage' && (
-                      <BotBubble
-                        message={message.message}
-                        fileAnnotations={message.fileAnnotations}
-                        apiHost={props.apiHost}
-                        backgroundColor={props.botMessage?.backgroundColor}
-                        textColor={props.botMessage?.textColor}
-                        showAvatar={props.botMessage?.showAvatar}
-                        avatarSrc={props.botMessage?.avatarSrc}
-                        submit={handleSubmit}
-                      />
-                    )}
-                    {message.type === 'userMessage' && loading() && index() === messages().length - 1 && <LoadingBubble />}
-                    {message.sourceDocuments && message.sourceDocuments.length && (
-                      <div style={{ display: 'flex', 'flex-direction': 'row', width: '100%' }}>
-                        <For each={[...removeDuplicateURL(message)]}>
-                          {(src) => {
-                            const URL = isValidURL(src.metadata.source);
-                            return (
-                              <SourceBubble
-                                pageContent={URL ? URL.pathname : src.pageContent}
-                                metadata={src.metadata}
-                                onSourceClick={() => {
-                                  if (URL) {
-                                    window.open(src.metadata.source, '_blank');
-                                  } else {
-                                    setSourcePopupSrc(src);
-                                    setSourcePopupOpen(true);
-                                  }
-                                }}
-                              />
-                            );
-                          }}
-                        </For>
-                      </div>
-                    )}
-                  </>
-                )}
-              </For>
-            </div>
+      <div
+        ref={botContainer}
+        class={
+          'relative flex w-full h-full text-base overflow-hidden bg-cover bg-center flex-col items-center chatbot-container ' + (props.class || '')
+        }
+      >
+        <div class="flex w-full h-full justify-center">
+          <div
+            style={{ 'padding-bottom': '100px', 'padding-top': '70px' }}
+            ref={chatContainer}
+            class={
+              'overflow-y-scroll min-w-full w-full min-h-full px-3 pt-10 relative scrollable-container chatbot-chat-view ' +
+              (isSafari() ? 'scroll-auto' : 'scroll-smooth')
+            }
+          >
+            <For each={[...messages()]}>
+              {(message, index) => (
+                <>
+                  {message.type === 'userMessage' && (
+                    <GuestBubble
+                      message={message.message}
+                      backgroundColor={props.userMessage?.backgroundColor}
+                      textColor={props.userMessage?.textColor}
+                      showAvatar={props.userMessage?.showAvatar}
+                      avatarSrc={props.userMessage?.avatarSrc}
+                    />
+                  )}
+                  {message.type === 'apiMessage' && (
+                    <BotBubble
+                      message={message.message}
+                      fileAnnotations={message.fileAnnotations}
+                      apiHost={props.apiHost}
+                      backgroundColor={props.botMessage?.backgroundColor}
+                      textColor={props.botMessage?.textColor}
+                      showAvatar={props.botMessage?.showAvatar}
+                      avatarSrc={props.botMessage?.avatarSrc}
+                      submit={handleSubmit}
+                    />
+                  )}
+                  {message.type === 'userMessage' && loading() && index() === messages().length - 1 && <LoadingBubble />}
+                  {message.sourceDocuments && message.sourceDocuments.length && (
+                    <div style={{ display: 'flex', 'flex-direction': 'row', width: '100%' }}>
+                      <For each={[...removeDuplicateURL(message)]}>
+                        {(src) => {
+                          const URL = isValidURL(src.metadata.source);
+                          return (
+                            <SourceBubble
+                              pageContent={URL ? URL.pathname : src.pageContent}
+                              metadata={src.metadata}
+                              onSourceClick={() => {
+                                if (URL) {
+                                  window.open(src.metadata.source, '_blank');
+                                } else {
+                                  setSourcePopupSrc(src);
+                                  setSourcePopupOpen(true);
+                                }
+                              }}
+                            />
+                          );
+                        }}
+                      </For>
+                    </div>
+                  )}
+                </>
+              )}
+            </For>
+          </div>
+          {props.showTitle ? (
             <div
               style={{
                 display: 'flex',
@@ -513,35 +539,28 @@ export const Bot = (props: BotProps & { class?: string }) => {
                 <span style={{ 'font-family': 'Poppins, sans-serif' }}>Clear</span>
               </DeleteButton>
             </div>
-            <TextInput
-              backgroundColor={props.textInput?.backgroundColor}
-              textColor={props.textInput?.textColor}
-              placeholder={props.textInput?.placeholder}
-              sendButtonColor={props.textInput?.sendButtonColor}
-              fontSize={props.fontSize}
-              disabled={loading()}
-              defaultValue={userInput()}
-              onSubmit={handleSubmit}
-            />
-          </div>
-          <BottomSpacer ref={bottomSpacer} />
+          ) : null}
+          <TextInput
+            backgroundColor={props.textInput?.backgroundColor}
+            textColor={props.textInput?.textColor}
+            placeholder={props.textInput?.placeholder}
+            sendButtonColor={props.textInput?.sendButtonColor}
+            fontSize={props.fontSize}
+            disabled={loading()}
+            defaultValue={userInput()}
+            onSubmit={handleSubmit}
+          />
         </div>
         <Show when={messages().length === 1}>
           <Show when={starterPrompts().length > 0}>
-            <div style={{ display: 'flex', 'flex-direction': 'row', padding: '10px', width: '100%', "flex-wrap": 'wrap'}}>
-              <For each={[...starterPrompts()]}>
-                {(key) => (
-                  <StarterPromptBubble
-                    prompt={key}
-                    onPromptClick={() => promptClick(key)}
-                  />
-                )}
-              </For>
+            <div style={{ display: 'flex', 'flex-direction': 'row', padding: '10px', width: '100%', 'flex-wrap': 'wrap' }}>
+              <For each={[...starterPrompts()]}>{(key) => <StarterPromptBubble prompt={key} onPromptClick={() => promptClick(key)} />}</For>
             </div>
           </Show>
         </Show>
-        {sourcePopupOpen() && <Popup isOpen={sourcePopupOpen()} value={sourcePopupSrc()} onClose={() => setSourcePopupOpen(false)} />}
-      </MailProvider>
+        <BottomSpacer ref={bottomSpacer} />
+      </div>
+      {sourcePopupOpen() && <Popup isOpen={sourcePopupOpen()} value={sourcePopupSrc()} onClose={() => setSourcePopupOpen(false)} />}
     </>
   );
 };

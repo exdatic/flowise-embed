@@ -31,11 +31,21 @@
     --PhoneInput-color--focus: transparent;
   }
 
-  .string { color: green; }
-  .number { color: darkorange; }
-  .boolean { color: blue; }
-  .null { color: magenta; }
-  .key { color: rgb(0, 43, 54); }
+  .string {
+    color: green;
+  }
+  .number {
+    color: darkorange;
+  }
+  .boolean {
+    color: blue;
+  }
+  .null {
+    color: magenta;
+  }
+  .key {
+    color: rgb(0, 43, 54);
+  }
   
   /* Hide scrollbar for Chrome, Safari and Opera */
   .scrollable-container::-webkit-scrollbar {
