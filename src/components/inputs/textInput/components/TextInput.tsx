@@ -37,11 +37,11 @@ export const TextInput = (props: Props) => {
   };
 
   createEffect(() => {
-    if (!props.disabled && !isMobile() && inputRef) inputRef.focus();
+    if (!props.disabled && !isMobile() && inputRef) inputRef.focus({ preventScroll: true });
   });
 
   onMount(() => {
-    if (!isMobile() && inputRef) inputRef.focus();
+    if (!isMobile() && inputRef) inputRef.focus({ preventScroll: true });
   });
 
   return (
