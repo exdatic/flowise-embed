@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
       main {
-        margin: auto; max-width: 992px;
+        margin: auto;
+        max-width: 992px;
       }
       #chatbot {
         outline: 1px solid hsl(210, 6%, 93%);
@@ -21,26 +22,33 @@
   <body>
     <main>
       <h1>Chatbot Test</h1>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam massa elit, in facilisis nunc feugiat vitae. Sed tempor viverra molestie. Donec tincidunt placerat felis ut rhoncus. Mauris condimentum ultrices massa. Sed quis sapien eu massa pulvinar sagittis sed id quam. Curabitur ut magna pellentesque, lacinia est eu, scelerisque ex. Aenean pulvinar cursus lacus, sit amet ornare leo volutpat id. Vivamus lobortis libero ac lacinia dapibus. Pellentesque eget dolor non erat varius consequat. Proin lacinia, sem sed aliquet tempus, odio lacus scelerisque neque, id sodales elit nisi at massa. Nulla feugiat, est eget fermentum gravida, justo ipsum auctor arcu, hendrerit convallis lectus metus in dolor. Ut dignissim justo sed scelerisque sollicitudin. Fusce in ipsum in nibh blandit auctor.
+        Donec sem ligula, laoreet sed ullamcorper id, posuere non ante. Praesent id viverra nibh. Maecenas eleifend dolor ac orci cursus facilisis. Donec ligula augue, lacinia quis lobortis scelerisque, accumsan a elit. Nulla efficitur orci vitae nisi pretium, sit amet blandit erat maximus. Sed molestie neque quis sem rhoncus feugiat. Nullam tempus ipsum urna. Maecenas vulputate est sit amet diam pharetra, a laoreet odio gravida. Maecenas at ultricies erat. Morbi finibus erat ut ligula maximus, a sodales ex aliquet. Etiam luctus nibh sed nisi auctor viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lacinia cursus justo, ac tincidunt tellus sodales eget. Suspendisse placerat dolor et efficitur fringilla. Mauris sodales tempor finibus.
+      </p>
       <div id="warning"></div>
       <div id="chatbot">
         <flowise-fullchatbot></flowise-fullchatbot>
       </div>
+      <p>
+        Integer mattis sapien vel lorem porttitor, vitae consectetur arcu convallis. Vivamus dignissim feugiat laoreet. Ut sit amet ligula mi. Nullam massa ligula, ullamcorper vitae ullamcorper gravida, posuere in justo. Mauris nec facilisis elit. Ut nunc nulla, congue et felis sit amet, suscipit gravida mi. Praesent porttitor enim urna, sit amet faucibus sem tempus a. Nullam ornare mi sit amet volutpat dapibus. Maecenas at nulla molestie, lacinia est nec, vehicula massa. Suspendisse non accumsan metus, in convallis orci. Pellentesque tincidunt odio et porttitor molestie. Curabitur quis lacus sit amet leo aliquet rutrum. Aliquam et sapien leo. Etiam lacinia nunc nibh, molestie rutrum arcu bibendum ac. Aliquam ornare arcu sit amet nibh gravida, id ultricies quam molestie. Nullam sollicitudin, magna non efficitur euismod, dolor mi imperdiet ligula, in faucibus felis leo non tortor.
+        Proin ullamcorper, dolor sed dignissim lacinia, est lacus varius erat, vel faucibus mauris tellus ullamcorper nibh. Etiam id imperdiet lectus. Pellentesque orci elit, interdum in diam id, scelerisque laoreet nibh. Aliquam ac elementum lectus, eget dapibus mi. Praesent volutpat, risus ac finibus aliquam, orci augue tempor purus, vel facilisis diam elit viverra enim. Nullam feugiat massa id ipsum cursus, eu cursus elit blandit. Nam euismod diam sed metus consequat dignissim.
+      </p>
       <script type="module">
         import Chatbot from "./web.js"
-        const chatflowid = new URLSearchParams(location.search).get("chatflowid");
+        const chatflowid = new URLSearchParams(location.search).get('chatflowid') || '';
         if (!chatflowid) {
-          document.getElementById("warning").innerHTML =
-            "Please provide a <code>chatflowid</code> in the URL query string.";
-            Chatbot.initFull({
-              chatflowid: "",
-              apiHost: "https://chat.exdatis.com",
-            })
-          } else {
-          Chatbot.initFull({
-            chatflowid: chatflowid,
-            apiHost: "https://chat.exdatis.com",
-          })
+          document.getElementById("warning").innerHTML = "Please provide a <code>chatflowid</code> in the URL query string.";
         }
+        Chatbot.initFull({
+          chatflowid,
+          apiHost: 'https://chat.exdatis.com',
+          theme: {
+            chatWindow: {
+              height: '80vh',
+            }
+          }
+        });
       </script>
     </main>
   </body>
