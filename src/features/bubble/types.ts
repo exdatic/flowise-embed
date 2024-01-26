@@ -34,8 +34,8 @@ export type ChatWindowTheme = {
   titleAvatarSrc?: string;
   welcomeMessage?: string;
   backgroundColor?: string;
-  height?: number;
-  width?: number;
+  height?: number | string;
+  width?: number | string;
   fontSize?: number;
   userMessage?: UserMessageTheme;
   botMessage?: BotMessageTheme;

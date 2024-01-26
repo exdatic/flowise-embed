@@ -7,6 +7,9 @@ import { createSignal, onCleanup, onMount, Show } from 'solid-js';
 const defaultButtonColor = '#3B81F6';
 const defaultIconColor = 'white';
 
+const toCssUnit = (value: number | string) =>
+  typeof value === 'number' ? `${value}px` : value;
+
 export type FullProps = BotProps & BubbleParams;
 
 export const Full = (props: FullProps, { element }: { element: HTMLElement }) => {
@@ -35,8 +38,8 @@ export const Full = (props: FullProps, { element }: { element: HTMLElement }) =>
         <div
           style={{
             'background-color': props.theme?.chatWindow?.backgroundColor || '#ffffff',
-            height: props.theme?.chatWindow?.height ? `${props.theme?.chatWindow?.height.toString()}px` : '100vh',
-            width: props.theme?.chatWindow?.width ? `${props.theme?.chatWindow?.width.toString()}px` : '100%',
+            height: props.theme?.chatWindow?.height ? toCssUnit(props.theme.chatWindow.height) : '100vh',
+            width: props.theme?.chatWindow?.width ? toCssUnit(props.theme.chatWindow.width) : '100%',
             margin: '0px',
           }}
         >
