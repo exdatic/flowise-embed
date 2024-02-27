@@ -1,6 +1,6 @@
 {
   "name": "@exdatic/flowise-embed",
-  "version": "1.0.19-1",
+  "version": "1.1.0-1",
   "description": "Javascript library to display flowise chatbot on your website",
   "type": "module",
   "main": "dist/index.js",
@@ -18,11 +18,11 @@
   "dependencies": {
     "@babel/core": "^7.23.9",
     "@ts-stack/markdown": "^1.5.0",
-    "flowbite": "^2.2.1",
+    "flowbite": "^2.3.0",
     "lodash": "^4.17.21",
     "socket.io-client": "^4.7.4",
     "solid-element": "1.8.0",
-    "solid-js": "1.8.12"
+    "solid-js": "1.8.15"
   },
   "devDependencies": {
     "@babel/preset-typescript": "7.23.3",
@@ -58,7 +58,7 @@
     "rollup-plugin-serve": "3.0.0",
     "rollup-plugin-typescript-paths": "1.5.0",
     "rollup-plugin-uglify": "^6.0.4",
-    "tailwindcss": "3.3.6",
+    "tailwindcss": "3.4.1",
     "typescript": "5.3.3",
     "uuid": "^9.0.1"
   },
