@@ -31,7 +31,7 @@ export const Bubble = (props: BubbleProps) => {
   const toggleBot = () => {
     isBotOpened() ? closeBot() : openBot();
   };
-  
+
   onCleanup(() => {
     setIsBotStarted(false);
   });
