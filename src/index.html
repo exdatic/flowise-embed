@@ -10,7 +10,7 @@
         max-width: 992px;
       }
       #chatbot {
-        outline: 1px solid hsl(210, 6%, 93%);
+        outline: 1px solid #3b81f6;
         border-radius: 6px;
       }
       #warning {
@@ -46,7 +46,15 @@
           theme: {
             chatWindow: {
               height: '80vh',
-            }
+              botMessage: {
+                showAvatar: true,
+                avatarSrc: "https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/parroticon.png"
+              },
+              userMessage: {
+                showAvatar: true,
+                avatarSrc: "https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/usericon.png"
+              }
+            },
           }
         });
       </script>

@@ -29,41 +29,43 @@ export const GuestBubble = (props: Props) => {
   });
 
   return (
-    <div class="flex justify-end mb-2 items-end guest-container" style={{ 'margin-left': '50px' }}>
-      <div
-        class="max-w-full flex flex-col justify-center items-start chatbot-guest-bubble px-4 py-2 gap-2 prose"
-        data-testid="guest-bubble"
-        style={{
-          'background-color': props.backgroundColor ?? defaultBackgroundColor,
-          color: props.textColor ?? defaultTextColor,
-          'border-radius': '6px',
-        }}
-      >
-        {props.message.fileUploads && props.message.fileUploads.length > 0 && (
-          <div class="flex flex-col items-start flex-wrap w-full gap-2">
-            <For each={props.message.fileUploads}>
-              {(item) => {
-                const fileData = `${props.apiHost}/api/v1/get-upload-file?chatflowId=${props.chatflowid}&chatId=${props.chatId}&fileName=${item.name}`;
-                const src = (item.data as string) ?? fileData;
-                return (
-                  <>
-                    {item.mime && item.mime.startsWith('image/') ? (
-                      <div class="flex items-center justify-center max-w-[128px] mr-[10px] p-0 m-0">
-                        <img class="w-full h-full bg-cover" src={src} />
-                      </div>
-                    ) : (
-                      <audio class="w-[200px] h-10 block bg-cover bg-center rounded-none text-transparent" controls>
-                        Your browser does not support the &lt;audio&gt; tag.
-                        <source src={src} type={item.mime} />
-                      </audio>
-                    )}
-                  </>
-                );
-              }}
-            </For>
-          </div>
-        )}
-        {props.message.message && <span ref={userMessageEl} class="mr-2 whitespace-pre-wrap" />}
+    <div class="flex flex-nowrap justify-end">
+      <div class="flex justify-end mb-4 items-end guest-container" style={{ 'margin-left': '50px' }}>
+        <div
+          class="max-w-full flex flex-col justify-center items-start chatbot-guest-bubble px-4 py-2 mr-2 gap-2 prose"
+          data-testid="guest-bubble"
+          style={{
+            'background-color': props.backgroundColor ?? defaultBackgroundColor,
+            color: props.textColor ?? defaultTextColor,
+            'border-radius': '6px',
+          }}
+        >
+          {props.message.fileUploads && props.message.fileUploads.length > 0 && (
+            <div class="flex flex-col items-start flex-wrap w-full gap-2">
+              <For each={props.message.fileUploads}>
+                {(item) => {
+                  const fileData = `${props.apiHost}/api/v1/get-upload-file?chatflowId=${props.chatflowid}&chatId=${props.chatId}&fileName=${item.name}`;
+                  const src = (item.data as string) ?? fileData;
+                  return (
+                    <>
+                      {item.mime && item.mime.startsWith('image/') ? (
+                        <div class="flex items-center justify-center max-w-[128px] mr-[10px] p-0 m-0">
+                          <img class="w-full h-full bg-cover" src={src} />
+                        </div>
+                      ) : (
+                        <audio class="w-[200px] h-10 block bg-cover bg-center rounded-none text-transparent" controls>
+                          Your browser does not support the &lt;audio&gt; tag.
+                          <source src={src} type={item.mime} />
+                        </audio>
+                      )}
+                    </>
+                  );
+                }}
+              </For>
+            </div>
+          )}
+          {props.message.message && <span ref={userMessageEl} class="mr-2 whitespace-pre-wrap" />}
+        </div>
       </div>
       <Show when={props.showAvatar}>
         <Avatar initialAvatarSrc={props.avatarSrc} />
