@@ -60,6 +60,7 @@ export const Full = (props: FullProps, { element }: { element: HTMLElement }) =>
               chatflowid={props.chatflowid}
               chatflowConfig={props.chatflowConfig}
               apiHost={props.apiHost}
+              // When the isFullPage property is set, the chat window will have rounded borders with a radius of 6px.
               isFullPage={props.theme?.chatWindow?.isFullPage}
               observersConfig={props.observersConfig}
             />
