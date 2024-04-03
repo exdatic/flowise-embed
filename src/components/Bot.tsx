@@ -396,7 +396,7 @@ export const Bot = (botProps: BotProps & { class?: string }) => {
 
         updateLastMessage(text, data?.chatMessageId, data?.sourceDocuments, data?.fileAnnotations);
       } else {
-        updateLastMessage('', data?.chatMessageId);
+        updateLastMessage('', data?.chatMessageId, data?.sourceDocuments, data?.fileAnnotations);
       }
       setLoading(false);
       setUserInput('');
@@ -834,6 +834,8 @@ export const Bot = (botProps: BotProps & { class?: string }) => {
                         textColor={props.userMessage?.textColor}
                         showAvatar={props.userMessage?.showAvatar}
                         avatarSrc={props.userMessage?.avatarSrc}
+                        fontSize={props.fontSize}
+                        submit={handleSubmit}
                       />
                     )}
                     {message.type === 'apiMessage' && (
@@ -849,6 +851,7 @@ export const Bot = (botProps: BotProps & { class?: string }) => {
                         avatarSrc={props.botMessage?.avatarSrc}
                         chatFeedbackStatus={chatFeedbackStatus()}
                         submit={handleSubmit}
+                        fontSize={props.fontSize}
                       />
                     )}
                     {message.type === 'userMessage' && loading() && index() === messages().length - 1 && <LoadingBubble />}
